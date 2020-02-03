@@ -39,12 +39,12 @@ uint32_t Sig1(uint32_t x){
 	return ROTR(x, 6) ^ ROTR(x, 11) ^ ROTR(x, 25);
 }
 
-uint32_t Sig2(uint32_t x){
+uint32_t sig2(uint32_t x){
 	// Section  4.1.2 of SHA Standard
 	return ROTR(x, 4) ^ ROTR(x, 18) ^ SHR(x, 3);
 }
 
-uint32_t Sig3(uint32_t x){
+uint32_t sig3(uint32_t x){
 	// Section  4.1.2 of SHA Standard
 	return ROTR(x, 17) ^ ROTR(x, 19) ^ SHR(x, 10);
 }
@@ -64,8 +64,8 @@ int main(int argc, char *argv[]){
 	
 	printf("Sig0(x) = %08x\n", Sig0(x));
 	printf("Sig1(x) = %08x\n", Sig1(x));
-	printf("Sig2(x) = %08x\n", Sig2(x));
-	printf("Sig3(x) = %08x\n", Sig3(x));
+	printf("sig2(x) = %08x\n", sig2(x));
+	printf("sig3(x) = %08x\n", sig3(x));
 
 	return 0;
 }
