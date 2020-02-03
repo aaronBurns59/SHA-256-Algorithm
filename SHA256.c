@@ -3,9 +3,12 @@
 #include<stdio.h>
 #include<stdint.h>
 
+//Ch is for choose, you use x to determine what bits
+// from z or y you take from 
 uint32_t Ch(uint32_t x, uint32_t y, uint32_t z){
 	// Section 4.1.2 of SHA Standard
-	return (x & y) ^ (!x & z);
+	// ~ is NOT in c
+	return (x & y) ^ (~x & z);
 }
 
 int main(int argc, char *argv[]){
