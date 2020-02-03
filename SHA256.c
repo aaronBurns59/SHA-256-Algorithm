@@ -29,6 +29,11 @@ uint32_t ROTR(uint32_t x, int n){
 	return (x>>n) | (x << (32 - n));
 }
 
+uint32_t Sig0(uint32_t x){
+	// Section  4.1.2 of SHA Standard
+	return ROTR(x, 2) ^ ROTR(x, 13) ^ ROTR(x, 22);
+}
+
 int main(int argc, char *argv[]){
 	uint32_t x = 0x0f0f0f0f;
 	uint32_t y = 0xcccccccc;
@@ -41,6 +46,8 @@ int main(int argc, char *argv[]){
 	
 	printf("SHA(x,4) = %08x\n", SHR(x, 4));
 	printf("ROTR(x,4) = %08x\n", ROTR(x, 4));
+	
+	printf("Sig0(x) = %08x\n", Sig0(x));
 
 	return 0;
 }
