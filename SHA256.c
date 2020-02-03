@@ -23,6 +23,12 @@ uint32_t SHR(uint32_t x, int n){
 	return x>>n;
 }
 
+uint32_t ROTR(uint32_t x, int n){
+	// Section 3.2 of SHA Standard
+	// bit-shift x to the right the value of n	
+	return (x>>n) | (x << (32 - n));
+}
+
 int main(int argc, char *argv[]){
 	uint32_t x = 0x0f0f0f0f;
 	uint32_t y = 0xcccccccc;
@@ -33,5 +39,8 @@ int main(int argc, char *argv[]){
 	printf("Ch(x,y,z) = %08x\n", Ch(x,y,z));
 	printf("Maj(x,y,z) = %08x\n", Maj(x,y,z));
 	
+	printf("SHA(x,4) = %08x\n", SHR(x, 4));
+	printf("ROTR(x,4) = %08x\n", ROTR(x, 4));
+
 	return 0;
 }
