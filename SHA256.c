@@ -17,6 +17,12 @@ uint32_t Maj(uint32_t x, uint32_t y, uint32_t z){
 	return (x & y) ^ (x & z) ^ (y & z);
 }
 
+uint32_t SHR(uint32_t x, int n){
+	// Section 3.2 of SHA Standard
+	// bit-shift x to the right the value of n	
+	return x>>n;
+}
+
 int main(int argc, char *argv[]){
 	uint32_t x = 0x0f0f0f0f;
 	uint32_t y = 0xcccccccc;
