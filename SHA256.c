@@ -14,6 +14,11 @@ const uint32_t K[] = {
 	0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f
 };
 
+const uint32_t H[] = {
+	0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+	0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 
+};
+
 // Ch is for choose, you use x to determine what bits from z or y you take from 
 uint32_t Ch(uint32_t x, uint32_t y, uint32_t z){
 	// Section 4.1.2 of SHA Standard
@@ -79,6 +84,7 @@ int main(int argc, char *argv[]){
 	printf("sig3(x) = %08x\n", sig3(x));
 
 	printf("K[0] = %08x\n", K[0]);
-	
+	printf("H[0] = %08x\n", H[0]);
+
 	return 0;
 }
