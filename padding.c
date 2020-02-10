@@ -24,7 +24,8 @@ int main(int argc, char* argv[]){
 	// allows us to overwrite the value stored in the address b
 	// It reads the file 1 byte at a time
 	for(;fread(&b, 1, 1, infile) == 1;){
-		printf("%02x", b);
+		// PRI is the correct format specifier for hexidecimal
+		printf("%02" PRIx8 " ", b);
 	}
 	
 	printf("\n");
