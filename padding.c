@@ -14,9 +14,20 @@ int main(int argc, char* argv[]){
 	FILE *infile = fopen(argv[1], "rb");
 
 	if(!infile){
-		printf("Error: Could not open file %s", argv[1]);
+		printf("Error: Could not open file %s\n", argv[1]);
 		return 1;	
 	}
+
+	uint8_t b;
+	
+	//  '&' is the address of b not b itself
+	// allows us to overwrite the value stored in the address b
+	// It reads the file 1 byte at a time
+	for(;fread(&b, 1, 1, infile) == 1;){
+		printf("%02x", b);
+	}
+	
+	printf("\n");
 	
 	fclose(infile);
 
