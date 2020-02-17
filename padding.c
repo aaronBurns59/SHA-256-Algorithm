@@ -6,6 +6,12 @@
 // includes formatters for printing 64 bit integers
 #include<inttypes.h>
 
+union block{
+	uint64_t sixFour[8];
+	uint32_t threeTwo[16];
+	uint8_t eight[64];
+};
+
 uint64_t NoZerosBytes(uint64_t nobits){
 	// the number of bits from the file retrieved from the read file block of code ()
 	// ULL : Unsigned Long Long integer (Makes sure c saves var as a 64 bit integer)
@@ -36,20 +42,22 @@ int main(int argc, char* argv[]){
 		return 1;	
 	}
 	
-	// read a byte at a time from the input file
+	// read a byte at a time from the input f
 	uint8_t b;
 	// keep track of the number of bits read from the input
-	uint64_t nobits;	
-	
+	uint64_t nobits;
+	union block M;
+	uint8_t i;
+
 	//  '&' is the address of b not b itself
 	// allows us to overwrite the value stored in the address b
 	// It reads the file 1 byte at a time
 	// nobits += 8 : gets the number of bits read
-	for(;fread(&b, 1, 1, infile) == 1; nobits += 8){
+	for(nobits = 0, i = 0; fread(&M.eight[i], 1, 1, infile) == 1; nobits += 8){
 		// PRIx8 is the correct format specifier for hexidecimal
 		// b is the byte to be printed
 		// %02 means give each byte 2 spaces ((if it's 9 make it 09))
-		printf("%02" PRIx8, b);
+		printf("%02" PRIx8, M.eight[i]);
 	}
 
 	// this is the 1 appended to the message block
