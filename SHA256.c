@@ -21,6 +21,12 @@ const uint32_t H[] = {
 	0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 
 };
 
+union block{
+	uint32_t threeTwo[16];
+	uint64_t sixFour[8];
+	uint8_t eight[64];
+};
+
 // Ch is for choose, you use x to determine what bits from z or y you take from 
 uint32_t Ch(uint32_t x, uint32_t y, uint32_t z){
 	// Section 4.1.2 of SHA Standard
@@ -67,24 +73,6 @@ uint32_t sig3(uint32_t x){
 	return ROTR(x, 17) ^ ROTR(x, 19) ^ SHR(x, 10);
 }
 
-int main(int argc, char *argv[]){
-
-	return 0;
-}
-// Aaron Burns
-// Padding for SHA-256
-
-// used for input and output for files 
-#include<stdio.h>
-// includes formatters for printing 64 bit integers
-#include<inttypes.h>
-
-union block{
-	uint64_t sixFour[8];
-	uint32_t threeTwo[16];
-	uint8_t eight[64];
-};
-
 uint64_t NoZerosBytes(uint64_t nobits){
 	// the number of bits from the file retrieved from the read file block of code ()
 	// ULL : Unsigned Long Long integer (Makes sure c saves var as a 64 bit integer)
@@ -98,6 +86,23 @@ uint64_t NoZerosBytes(uint64_t nobits){
 	// get the number of 0 bytes needed to pad between the 1 and the 64 bit integer printed at the end
 	result -=72;
 	return (result/ 8ULL); 
+}
+
+int nextblock(union block *M, FILE *infile){
+	//  '&' is the address of b not b itself
+	// allows us to overwrite the value stored in the address b
+	// It reads the file 1 byte at a time
+	// nobits += 8 : gets the number of bits read
+	for(nobits = 0, i = 0; fread(&M.eight[i], 1, 1, infile) == 1; nobits += 8){
+	
+	// Appending the bits 
+	printf("%02", PRIx8, 0x80);	// bits : 1000 0000
+	
+	for(uint64_t i = NoZerosBytes(nobits); i > 0; i--)
+		printf("%02" PRIx8, 0x00);
+	
+	// prints the number of bits to the screen 
+	printf("%016" PRIx64 "\n", nobits);		
 }
 
 int main(int argc, char* argv[]){
@@ -121,26 +126,12 @@ int main(int argc, char* argv[]){
 	uint64_t nobits;
 	union block M;
 	uint8_t i;
-
-	//  '&' is the address of b not b itself
-	// allows us to overwrite the value stored in the address b
-	// It reads the file 1 byte at a time
-	// nobits += 8 : gets the number of bits read
-	for(nobits = 0, i = 0; fread(&M.eight[i], 1, 1, infile) == 1; nobits += 8){
-		// PRIx8 is the correct format specifier for hexidecimal
-		// b is the byte to be printed
-		// %02 means give each byte 2 spaces ((if it's 9 make it 09))
-		printf("%02" PRIx8, M.eight[i]);
-	}
-
-	// this is the 1 appended to the message block
-	printf("%02", PRIx8, 0x80);	// bits : 1000 0000
 	
-	for(uint64_t i = NoZerosBytes(nobits); i > 0; i--)
-		printf("%02" PRIx8, 0x00);
-	// prints the number of bits to the screen 
-	printf("%016" PRIx64 "\n", nobits);
-	
+	// reads from the file until the end it reads blocks and returns padded blocks:
+	while (M = nextblock()){
+		H = nexthash(M, H);
+	}	
+
 	// need to close the file when finished with it
 	fclose(infile);
 
