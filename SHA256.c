@@ -15,12 +15,6 @@ const uint32_t K[] = {
 	0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f
 };
 
-// Section 5.3.3
-const uint32_t H[] = {
-	0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
-	0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 
-};
-
 union block{
 	uint32_t threeTwo[16];
 	uint64_t sixFour[8];
@@ -89,10 +83,10 @@ uint64_t NoZerosBytes(uint64_t nobits){
 }
 
 int nextblock(union block *M, FILE *infile){
-	//  '&' is the address of b not b itself
-	// allows us to overwrite the value stored in the address b
-	// It reads the file 1 byte at a time
-	// nobits += 8 : gets the number of bits read
+	
+	uint64_t nobits;
+	uint8_t i;
+
 	for(nobits = 0, i = 0; fread(&M.eight[i], 1, 1, infile) == 1; nobits += 8){
 	
 	// Appending the bits 
@@ -120,15 +114,18 @@ int main(int argc, char* argv[]){
 		return 1;	
 	}
 	
-	// read a byte at a time from the input f
-	uint8_t b;
 	// keep track of the number of bits read from the input
-	uint64_t nobits;
+	// Current padded message block
 	union block M;
-	uint8_t i;
+
+// Section 5.3.3
+const uint32_t H[] = {
+	0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+	0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 
+};
 	
-	// reads from the file until the end it reads blocks and returns padded blocks:
-	while (M = nextblock()){
+	// reads from the file until the end it reads blocks and returns padded blocks
+	while (M = nextblock(&M, infile)){
 		H = nexthash(M, H);
 	}	
 
