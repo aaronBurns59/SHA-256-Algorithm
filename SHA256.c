@@ -81,22 +81,26 @@ uint64_t NoZerosBytes(uint64_t nobits){
 	result -=72;
 	return (result/ 8ULL); 
 }
+	// handy list of constantsi
+	// these are the 4 possible scenarios nextblock can come across
+enum flag {READ, PAD1, PAD0, FINISH};
+// *status gets the enum value of the current state
+int nextblock(union block *M, FILE *infile, uint64_t *nobits, enum flag *status){
+	uint8_t i
 
-int nextblock(union block *M, FILE *infile){
+	for(*nobits = 0, i = 0; fread(&M.eight[i], 1, 1, infile) == 1; *nobits += 8)
+		// Appending the bits 
+		printf("%02" PRIX8, M.eight[i]);	// bits : 1000 0000
 	
-	uint64_t nobits;
-	uint8_t i;
-
-	for(nobits = 0, i = 0; fread(&M.eight[i], 1, 1, infile) == 1; nobits += 8){
-	
-	// Appending the bits 
-	printf("%02", PRIx8, 0x80);	// bits : 1000 0000
-	
-	for(uint64_t i = NoZerosBytes(nobits); i > 0; i--)
-		printf("%02" PRIx8, 0x00);
+	for(uint64_t i = NoZerosBytes(*nobits); i > 0; i--)
+		printf("%02" PRIX8, 0x00);
 	
 	// prints the number of bits to the screen 
-	printf("%016" PRIx64 "\n", nobits);		
+	printf("%016" PRIX64 "\n", *nobits);		
+}
+
+void nexthash(union block *M, uint32_t *H){
+	
 }
 
 int main(int argc, char* argv[]){
@@ -124,13 +128,25 @@ const uint32_t H[] = {
 	0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 
 };
 	
+	uint64_t nobits = 0;
+	enum flag status = READ;
+
 	// reads from the file until the end it reads blocks and returns padded blocks
-	while (M = nextblock(&M, infile)){
-		H = nexthash(M, H);
+	// reads in an 8-bit value
+	while (nextblock(&M, infile, nobits, status)){
+		// calculate the next hash value	
+		// uses the 32-bit value
+		nexthash(M, &H);
 	}	
 
 	// need to close the file when finished with it
-	fclose(infile);
+		
+	// print the last hash value
+	for(int i; i < 8; i++)
+		printf("%02" PRIX32, H[i]);
+	printf("\n");
 
+	fclose(infile);
+	
 	return 0;
 }
