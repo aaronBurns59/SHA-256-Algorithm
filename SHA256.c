@@ -100,17 +100,39 @@ int nextblock(union block *M, FILE *infile, uint64_t *nobits, enum flag *status)
 	// prints the number of bits to the screen 
 	printf("%016" PRIX64 "\n", *nobits);		
 }
-//Section 6.2.2
+
 void nexthash(union block *M, uint32_t *H){
 	uint32_t W[64];
+	uint32_t T1,T2,a,b,c,d,e,f,g,h;
 	int t;	
 
 	for(t = 0; t <= 15; t++){
 		// The union M->threeTwo allows W to be handled as a 32-bit integer
 		W[t] = M->threeTwo[t];
-	}	
+	}
+	// Section 6.2.2	
 	for(t = 16; t <= 63; t++){
 		W[t]= sig1(W[t-2]) + W[t-7] + sig0(W[t-15]) + W[t-16];
+	}
+	// Store the values in H in 8 different variables
+	// automatically gets the index from the pointer
+	a = H[0];
+	b = H[1];
+	c = H[2];
+	d = H[3];
+	e = H[4];
+	f = H[5];
+	g = H[6];
+	h = H[7];
+
+	for(t = 0; t <= 63; t++){
+		T1 = h + Sig1(e) + Ch(e,f,g) + K[t] + W[t];
+		T2 = Sig0(a) + Maj(a,b,c);
+		h=g; g=f; f=e;
+		e=d + T1;
+		d=c; c=b; b=a;
+		a=T1 + T2;
+	
 	}
 }
 
