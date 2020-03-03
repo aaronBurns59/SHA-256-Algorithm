@@ -2,6 +2,7 @@
 // Sourced from: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
 #include<stdio.h>
 #include<stdint.h>
+#include<inttypes.h>
 
 // Section 4.2.2
 const uint32_t K[] = {
@@ -86,11 +87,11 @@ uint64_t NoZerosBytes(uint64_t nobits){
 enum flag {READ, PAD1, PAD0, FINISH};
 // *status gets the enum value of the current state
 int nextblock(union block *M, FILE *infile, uint64_t *nobits, enum flag *status){
-	uint8_t i
+	uint8_t i;
 
-	for(*nobits = 0, i = 0; fread(&M.eight[i], 1, 1, infile) == 1; *nobits += 8)
+	for(*nobits = 0, i = 0; fread(&M->eight[i], 1, 1, infile) == 1; *nobits += 8)
 		// Appending the bits 
-		printf("%02" PRIX8, M.eight[i]);	// bits : 1000 0000
+		printf("%02" PRIX8, M->eight[i]);	// bits : 1000 0000
 	
 	for(uint64_t i = NoZerosBytes(*nobits); i > 0; i--)
 		printf("%02" PRIX8, 0x00);
@@ -122,11 +123,11 @@ int main(int argc, char* argv[]){
 	// Current padded message block
 	union block M;
 
-// Section 5.3.3
-const uint32_t H[] = {
+	// Section 5.3.3
+	uint32_t H[] = {
 	0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
 	0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 
-};
+	};
 	
 	uint64_t nobits = 0;
 	enum flag status = READ;
@@ -136,7 +137,7 @@ const uint32_t H[] = {
 	while (nextblock(&M, infile, nobits, status)){
 		// calculate the next hash value	
 		// uses the 32-bit value
-		nexthash(M, &H);
+		nexthash(&M, &H);
 	}	
 
 	// need to close the file when finished with it
