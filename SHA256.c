@@ -116,14 +116,8 @@ void nexthash(union block *M, uint32_t *H){
 	}
 	// Store the values in H in 8 different variables
 	// automatically gets the index from the pointer
-	a = H[0];
-	b = H[1];
-	c = H[2];
-	d = H[3];
-	e = H[4];
-	f = H[5];
-	g = H[6];
-	h = H[7];
+	a = H[0]; b = H[1]; c = H[2]; d = H[3];
+	e = H[4]; f = H[5]; g = H[6]; h = H[7];
 
 	for(t = 0; t <= 63; t++){
 		T1 = h + Sig1(e) + Ch(e,f,g) + K[t] + W[t];
@@ -133,6 +127,14 @@ void nexthash(union block *M, uint32_t *H){
 		d=c; c=b; b=a;
 		a=T1 + T2;
 	
+		H[0] = a + H[0]; 
+		H[1] = b + H[1];
+		H[2] = c + H[2];
+		H[3] = d + H[3];
+		H[4] = e + H[4];
+		H[5] = f + H[5];
+		H[6] = g + H[6];
+		H[7] = h + H[7];
 	}
 }
 
