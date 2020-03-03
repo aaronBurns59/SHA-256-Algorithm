@@ -58,12 +58,12 @@ uint32_t Sig1(uint32_t x){
 	return ROTR(x, 6) ^ ROTR(x, 11) ^ ROTR(x, 25);
 }
 
-uint32_t sig2(uint32_t x){
+uint32_t sig0(uint32_t x){
 	// Section  4.1.2 of SHA Standard
-	return ROTR(x, 4) ^ ROTR(x, 18) ^ SHR(x, 3);
+	return ROTR(x, 7) ^ ROTR(x, 18) ^ SHR(x, 3);
 }
 
-uint32_t sig3(uint32_t x){
+uint32_t sig1(uint32_t x){
 	// Section  4.1.2 of SHA Standard
 	return ROTR(x, 17) ^ ROTR(x, 19) ^ SHR(x, 10);
 }
@@ -87,6 +87,7 @@ uint64_t NoZerosBytes(uint64_t nobits){
 enum flag {READ, PAD1, PAD0, FINISH};
 // *status gets the enum value of the current state
 int nextblock(union block *M, FILE *infile, uint64_t *nobits, enum flag *status){
+	
 	uint8_t i;
 
 	for(*nobits = 0, i = 0; fread(&M->eight[i], 1, 1, infile) == 1; *nobits += 8)
@@ -99,9 +100,18 @@ int nextblock(union block *M, FILE *infile, uint64_t *nobits, enum flag *status)
 	// prints the number of bits to the screen 
 	printf("%016" PRIX64 "\n", *nobits);		
 }
-
+//Section 6.2.2
 void nexthash(union block *M, uint32_t *H){
-	
+	uint32_t W[64];
+	int t;	
+
+	for(t = 0; t <= 15; t++){
+		// The union M->threeTwo allows W to be handled as a 32-bit integer
+		W[t] = M->threeTwo[t];
+	}	
+	for(t = 16; t <= 63; t++){
+		W[t]= sig1(W[t-2]) + W[t-7] + sig0(W[t-15]) + W[t-16];
+	}
 }
 
 int main(int argc, char* argv[]){
