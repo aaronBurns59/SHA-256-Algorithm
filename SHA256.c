@@ -86,15 +86,47 @@ uint64_t NoZerosBytes(uint64_t nobits){
 }
 	// handy list of constantsi
 	// these are the 4 possible scenarios nextblock can come across
-enum flag {READ, PAD1, PAD0, FINISH};
+enum flag {READ, PAD0, FINISH};
 // *status gets the enum value of the current state
 // *nobits is for this function to keep track of the bits it has read
 int nextblock(union block *M, FILE *infile, uint64_t *nobits, enum flag *status){
 	
-	size_t noBytesRead = fread(M->eight, 1, 64, infile);
+	// check the status of the padding flag before anything is read in
+	if(*status == FINISH)
+		return 0;
 
-	for(uint64_t i = NoZerosBytes(*nobits); i > 0; i--)
-		printf("%02" PRIX8, 0x00);
+
+	if(*status == PAD0)
+	{
+		// < 56 because you need to leave room for the last 8 bytes of the message 64 - 8 = 56
+		for(int i = 0; i < 56; i++)
+			M->eight[0];
+		// need to stick the 64 bit message into the last 8 bytes of the now padded message
+		// index 7 is the last byte of this version of M in its 64 bit form
+		// make the last byte of M equal to the message passed in
+		// the rest of the bytes in M are now 0's except for the first bit which is a single 1-bit
+		M->sixFour[7]  = *nobits;
+		// the padding is done, set the status to finish
+		*status= FINISH;
+		return 1;
+	}// if
+
+	size_t noBytesRead = fread(M->eight, 1, 64, infile);
+	if(noBytesRead == 64)
+		return 1;
+
+	// can fit all the padding in the last block
+	if(noBytesRead < 56)
+	{
+		// this will be the position to put the 1 bit
+		M->eight[noBytesRead] = 0x80;
+		for(int i = noBytesRead + 1; i < 56; i++)
+			M->eight[i] = 0;
+		M->sixFour[7] = *nobits;
+		*status = FINISH;
+		return 1;
+	}// if
+
 	
 }
 
