@@ -16,6 +16,8 @@ const uint32_t K[] = {
 	0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f
 };
 
+// total amount of memory is 512 bits
+// the message that is going to be hashed is stored in this union structure
 union block{
 	uint32_t threeTwo[16];
 	uint64_t sixFour[8];
@@ -86,19 +88,14 @@ uint64_t NoZerosBytes(uint64_t nobits){
 	// these are the 4 possible scenarios nextblock can come across
 enum flag {READ, PAD1, PAD0, FINISH};
 // *status gets the enum value of the current state
+// *nobits is for this function to keep track of the bits it has read
 int nextblock(union block *M, FILE *infile, uint64_t *nobits, enum flag *status){
 	
-	uint8_t i;
+	size_t noBytesRead = fread(M->eight, 1, 64, infile);
 
-	for(*nobits = 0, i = 0; fread(&M->eight[i], 1, 1, infile) == 1; *nobits += 8)
-		// Appending the bits 
-		printf("%02" PRIX8, M->eight[i]);	// bits : 1000 0000
-	
 	for(uint64_t i = NoZerosBytes(*nobits); i > 0; i--)
 		printf("%02" PRIX8, 0x00);
 	
-	// prints the number of bits to the screen 
-	printf("%016" PRIX64 "\n", *nobits);		
 }
 
 void nexthash(union block *M, uint32_t *H){
@@ -168,7 +165,7 @@ int main(int argc, char* argv[]){
 
 	// reads from the file until the end it reads blocks and returns padded blocks
 	// reads in an 8-bit value
-	while (nextblock(&M, infile, nobits, status)){
+	while (nextblock(&M, infile, nobits, &status)){
 		// calculate the next hash value	
 		// uses the 32-bit value
 		nexthash(&M, &H);
