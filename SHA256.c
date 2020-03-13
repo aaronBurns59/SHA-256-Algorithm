@@ -95,7 +95,6 @@ int nextblock(union block *M, FILE *infile, uint64_t *nobits, enum flag *status)
 	if(*status == FINISH)
 		return 0;
 
-
 	if(*status == PAD0)
 	{
 		// < 56 because you need to leave room for the last 8 bytes of the message 64 - 8 = 56
